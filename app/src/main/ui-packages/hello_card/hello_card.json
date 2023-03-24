@@ -1,0 +1,134 @@
+{
+  "name": "hello_card",
+  "version": 32,
+  "source-key": {
+    "type": "figma",
+    "file": "mlwqMKeVs6mEK7ILCR9QHm",
+    "node": "4:2",
+    "version": "3189524747",
+    "component-id": "77f42cda4e5091ba7b8c377760faad351090ab19"
+  },
+  "default": "Hello Card",
+  "documentation": "A Hello Card used to display the image and title content",
+  "design": {
+    "atoms": [
+      {
+        "type": "group",
+        "id": "top_level",
+        "root": "true"
+      },
+      {
+        "type": "image",
+        "id": "Image"
+      },
+      {
+        "type": "text",
+        "id": "Title"
+      }
+    ],
+    "modes": {
+      "Hello Card": {
+        "rules": [
+          {
+            "id": "top_level",
+            "padding": "16.0",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "shrink"
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "main-axis-align": "start",
+            "cross-axis-align": "start",
+            "children": [
+              "Image",
+              "Title"
+            ],
+            "item-spacing": "16.0",
+            "background-color": {
+              "alpha": "1.0",
+              "hue": "32.3076923076923",
+              "saturation": "0.051587301587301626",
+              "value": "0.9882352941176471"
+            }
+          },
+          {
+            "id": "Image",
+            "drop-shadow": {
+              "color": {
+                "alpha": "0.24705882352941178",
+                "hue": "0.0",
+                "saturation": "0.0",
+                "value": "0.0"
+              },
+              "blur": "4.0",
+              "offset-x": "0.0",
+              "offset-y": "4.0",
+              "spread": "0.0",
+              "blend-mode": "normal"
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": "216.0"
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": "124.0"
+              }
+            },
+            "stroke-width": "2.0",
+            "stroke-color": {
+              "alpha": "1.0",
+              "hue": "197.85365853658536",
+              "saturation": "0.9403669724770641",
+              "value": "0.8549019607843137"
+            },
+            "image-content": "image.jpeg",
+            "scale": "cover"
+          },
+          {
+            "id": "Title",
+            "font-weight": "700.0",
+            "color": {
+              "alpha": "1.0",
+              "hue": "228.0",
+              "saturation": "0.15625",
+              "value": "0.12549019607843137"
+            },
+            "text-content": "$Title",
+            "overflow": "visible",
+            "text-align": "left",
+            "text-size": "24.0",
+            "line-height": "1.219000021616618",
+            "typeface": "Montserrat"
+          }
+        ]
+      }
+    }
+  },
+  "parameters": {
+    "Title": {
+      "data-type": "text",
+      "required": false,
+      "description": ""
+    }
+  },
+  "previews": [
+    {
+      "design": "Hello Card",
+      "size": {
+        "width": 248.0,
+        "height": 201.0
+      },
+      "parameters": {
+        "Title": "Hello World"
+      }
+    }
+  ],
+  "adin-component-search-paths": [],
+  "image-search-paths": [],
+  "vector-search-paths": []
+}

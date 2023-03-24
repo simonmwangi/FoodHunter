@@ -1,0 +1,735 @@
+{
+  "name": "news_card",
+  "version": 32,
+  "source-key": {
+    "type": "figma",
+    "file": "5WLWQrHBnUb63RJHkmd8gP",
+    "node": "2:68",
+    "version": "3189842337",
+    "component-id": "6cbbbd3c4c7acd3499433e489f3cb108e1c0e30f"
+  },
+  "default": "view=hero-item",
+  "documentation": "A news card for all various types of news",
+  "design": {
+    "atoms": [
+      {
+        "type": "group",
+        "id": "top_level",
+        "root": "true"
+      },
+      {
+        "type": "group",
+        "id": "content"
+      },
+      {
+        "type": "image",
+        "id": "thumbnail"
+      },
+      {
+        "type": "group",
+        "id": "title-group"
+      },
+      {
+        "type": "text",
+        "id": "headline"
+      },
+      {
+        "type": "group",
+        "id": "meta"
+      },
+      {
+        "type": "text",
+        "id": "author"
+      },
+      {
+        "type": "text",
+        "id": "date"
+      },
+      {
+        "type": "group",
+        "id": "thumbnail-frame"
+      },
+      {
+        "type": "group",
+        "id": "episode"
+      },
+      {
+        "type": "group",
+        "id": "controls"
+      },
+      {
+        "type": "image",
+        "id": "menu"
+      }
+    ],
+    "modes": {
+      "view=hero-item": {
+        "rules": [
+          {
+            "id": "top_level",
+            "padding": "16.0",
+            "border-radius": "24.0",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": "1.0"
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "main-axis-align": "start",
+            "cross-axis-align": "start",
+            "children": [
+              "content"
+            ],
+            "background-color": {
+              "alpha": "1.0",
+              "hue": "210.0",
+              "saturation": "0.35789473684210527",
+              "value": "0.37254901960784315"
+            },
+            "clip-content": "false"
+          },
+          {
+            "id": "content",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": "1.0"
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "main-axis-align": "start",
+            "cross-axis-align": "start",
+            "children": [
+              "thumbnail",
+              "title-group"
+            ],
+            "item-spacing": "8.0"
+          },
+          {
+            "id": "thumbnail",
+            "border-radius": "16.0",
+            "tap-handler": "$on thumbnail tapped",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": "1.0"
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": "158.0"
+              }
+            },
+            "image-content": "$thumbnail",
+            "scale": "cover"
+          },
+          {
+            "id": "title-group",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": "1.0"
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "main-axis-align": "start",
+            "cross-axis-align": "start",
+            "children": [
+              "headline",
+              "meta"
+            ],
+            "item-spacing": "8.0",
+            "clip-content": "false"
+          },
+          {
+            "id": "headline",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": "1.0"
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "font-weight": "500.0",
+            "color": {
+              "alpha": "1.0",
+              "hue": "0.0",
+              "saturation": "0.0",
+              "value": "1.0"
+            },
+            "text-content": "$headline",
+            "overflow": "visible",
+            "max-lines": "-1",
+            "text-align": "left",
+            "text-size": "22.0",
+            "line-height": "1.272727279663086"
+          },
+          {
+            "id": "meta",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "shrink"
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "main-axis-align": "start",
+            "cross-axis-align": "start",
+            "children": [
+              "author",
+              "date"
+            ],
+            "item-spacing": "4.0",
+            "clip-content": "false"
+          },
+          {
+            "id": "author",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": "322.0"
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "color": {
+              "alpha": "1.0",
+              "hue": "0.0",
+              "saturation": "0.0",
+              "value": "0.9058823529411765"
+            },
+            "text-content": "$author",
+            "overflow": "visible",
+            "max-lines": "-1",
+            "text-align": "left",
+            "letter-spacing": "0.25",
+            "line-height": "1.4285714721679688"
+          },
+          {
+            "id": "date",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": "1.0"
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "color": {
+              "alpha": "1.0",
+              "hue": "0.0",
+              "saturation": "0.0",
+              "value": "0.9058823529411765"
+            },
+            "text-content": "$date",
+            "overflow": "visible",
+            "max-lines": "-1",
+            "text-align": "left",
+            "text-size": "12.0",
+            "letter-spacing": "0.25",
+            "line-height": "1.6666667175292968"
+          }
+        ]
+      },
+      "view=article-item": {
+        "rules": [
+          {
+            "id": "top_level",
+            "padding": {
+              "left": "12.0",
+              "top": "8.0",
+              "right": "12.0",
+              "bottom": "12.0"
+            },
+            "border-radius": "24.0",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": "1.0"
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "main-axis-align": "start",
+            "cross-axis-align": "start",
+            "children": [
+              "content"
+            ],
+            "background-color": {
+              "alpha": "1.0",
+              "hue": "210.0",
+              "saturation": "0.35789473684210527",
+              "value": "0.37254901960784315"
+            },
+            "clip-content": "false"
+          },
+          {
+            "id": "content",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": "1.0"
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "arrangement": "row",
+            "main-axis-align": "start",
+            "cross-axis-align": "start",
+            "children": [
+              "thumbnail-frame",
+              "title-group"
+            ],
+            "item-spacing": "12.0"
+          },
+          {
+            "id": "thumbnail-frame",
+            "padding": {
+              "top": "4.0"
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "shrink"
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "arrangement": "row",
+            "main-axis-align": "start",
+            "cross-axis-align": "start",
+            "children": [
+              "thumbnail"
+            ],
+            "clip-content": "false"
+          },
+          {
+            "id": "title-group",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": "1.0"
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "main-axis-align": "start",
+            "cross-axis-align": "start",
+            "children": [
+              "headline",
+              "meta"
+            ],
+            "item-spacing": "4.0",
+            "clip-content": "false"
+          },
+          {
+            "id": "thumbnail",
+            "border-radius": "16.0",
+            "tap-handler": "$on thumbnail tapped",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": "68.0"
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": "68.0"
+              }
+            },
+            "image-content": "$thumbnail",
+            "scale": "cover"
+          },
+          {
+            "id": "headline",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": "1.0"
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "font-weight": "500.0",
+            "color": {
+              "alpha": "1.0",
+              "hue": "0.0",
+              "saturation": "0.0",
+              "value": "1.0"
+            },
+            "text-content": "$headline",
+            "overflow": "visible",
+            "max-lines": "-1",
+            "text-align": "left",
+            "text-size": "16.0",
+            "letter-spacing": "0.15000000596046448",
+            "line-height": "1.5"
+          },
+          {
+            "id": "meta",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": "1.0"
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "arrangement": "row",
+            "main-axis-align": "start",
+            "children": [
+              "author",
+              "date"
+            ],
+            "item-spacing": "8.0",
+            "clip-content": "false"
+          },
+          {
+            "id": "author",
+            "color": {
+              "alpha": "1.0",
+              "hue": "0.0",
+              "saturation": "0.0",
+              "value": "1.0"
+            },
+            "text-content": "$author",
+            "overflow": "visible",
+            "text-align": "left",
+            "text-align-vertical": "bottom",
+            "text-size": "12.0",
+            "letter-spacing": "0.25",
+            "line-height": "1.6666667175292968"
+          },
+          {
+            "id": "date",
+            "color": {
+              "alpha": "0.8",
+              "hue": "0.0",
+              "saturation": "0.0",
+              "value": "0.8431372549019608"
+            },
+            "text-content": "$date",
+            "overflow": "visible",
+            "text-align": "left",
+            "text-align-vertical": "bottom",
+            "text-size": "12.0",
+            "letter-spacing": "0.25",
+            "line-height": "1.6666667175292968"
+          }
+        ]
+      },
+      "view=audio-item": {
+        "rules": [
+          {
+            "id": "top_level",
+            "padding": "12.0",
+            "border-radius": "24.0",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "shrink"
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "main-axis-align": "start",
+            "cross-axis-align": "start",
+            "children": [
+              "content"
+            ],
+            "background-color": {
+              "alpha": "1.0",
+              "hue": "210.0",
+              "saturation": "0.35789473684210527",
+              "value": "0.37254901960784315"
+            },
+            "clip-content": "false"
+          },
+          {
+            "id": "content",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": "1.0"
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "main-axis-align": "start",
+            "cross-axis-align": "start",
+            "children": [
+              "episode",
+              "meta"
+            ],
+            "item-spacing": "8.0"
+          },
+          {
+            "id": "episode",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": "329.0"
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "arrangement": "row",
+            "main-axis-align": "start",
+            "cross-axis-align": "start",
+            "children": [
+              "title-group",
+              "thumbnail"
+            ],
+            "item-spacing": "8.0",
+            "clip-content": "false"
+          },
+          {
+            "id": "meta",
+            "padding": {
+              "top": "8.0"
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": "1.0"
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "arrangement": "row",
+            "main-axis-align": "space-between",
+            "children": [
+              "controls",
+              "menu"
+            ],
+            "clip-content": "false"
+          },
+          {
+            "id": "title-group",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": "1.0"
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "main-axis-align": "start",
+            "cross-axis-align": "start",
+            "children": [
+              "headline",
+              "author"
+            ],
+            "item-spacing": "8.0",
+            "clip-content": "false"
+          },
+          {
+            "id": "thumbnail",
+            "border-radius": "16.0",
+            "tap-handler": "$on thumbnail tapped",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": "66.0"
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": "66.0"
+              }
+            },
+            "image-content": "$thumbnail",
+            "scale": "cover"
+          },
+          {
+            "id": "headline",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": "1.0"
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "font-weight": "500.0",
+            "color": {
+              "alpha": "1.0",
+              "hue": "0.0",
+              "saturation": "0.0",
+              "value": "1.0"
+            },
+            "text-content": "$headline",
+            "overflow": "visible",
+            "max-lines": "-1",
+            "text-align": "left",
+            "text-size": "16.0",
+            "letter-spacing": "0.15000000596046448",
+            "line-height": "1.5"
+          },
+          {
+            "id": "author",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": "1.0"
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "color": {
+              "alpha": "1.0",
+              "hue": "0.0",
+              "saturation": "0.0",
+              "value": "1.0"
+            },
+            "text-content": "$author",
+            "overflow": "visible",
+            "max-lines": "-1",
+            "text-align": "left",
+            "text-size": "12.0",
+            "letter-spacing": "0.4000000059604645",
+            "line-height": "1.3333332824707032"
+          },
+          {
+            "id": "controls",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "shrink"
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "arrangement": "row",
+            "main-axis-align": "start",
+            "children": [
+              "date"
+            ],
+            "item-spacing": "12.0",
+            "clip-content": "false"
+          },
+          {
+            "id": "menu",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": "24.0"
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": "24.0"
+              }
+            },
+            "image-content": "menu.png",
+            "scale": "cover"
+          },
+          {
+            "id": "date",
+            "color": {
+              "alpha": "1.0",
+              "hue": "0.0",
+              "saturation": "0.0",
+              "value": "0.9058823529411765"
+            },
+            "text-content": "$date",
+            "overflow": "visible",
+            "text-align": "left",
+            "letter-spacing": "0.25",
+            "line-height": "1.4285714721679688"
+          }
+        ]
+      }
+    }
+  },
+  "parameters": {
+    "thumbnail": {
+      "data-type": "image",
+      "required": false,
+      "description": ""
+    },
+    "on thumbnail tapped": {
+      "data-type": "void-callback",
+      "required": false,
+      "description": ""
+    },
+    "headline": {
+      "data-type": "text",
+      "required": false,
+      "description": ""
+    },
+    "author": {
+      "data-type": "text",
+      "required": false,
+      "description": ""
+    },
+    "date": {
+      "data-type": "text",
+      "required": false,
+      "description": ""
+    }
+  },
+  "previews": [
+    {
+      "design": "view=hero-item",
+      "size": {
+        "width": 354.0,
+        "height": 306.0
+      },
+      "parameters": {
+        "thumbnail": "thumbnail.jpeg",
+        "headline": "The Wonderful Architectures of This Winter Season",
+        "author": "The Seasonal Sagas",
+        "date": "August 25, 2021"
+      }
+    },
+    {
+      "design": "view=article-item",
+      "size": {
+        "width": 354.0,
+        "height": 92.0
+      },
+      "parameters": {
+        "thumbnail": "thumbnail1.png",
+        "headline": "The New Method to Making Breakfast Crepes",
+        "author": "Morning Break",
+        "date": "November 10, 2021"
+      }
+    },
+    {
+      "design": "view=audio-item",
+      "size": {
+        "width": 353.0,
+        "height": 160.0
+      },
+      "parameters": {
+        "thumbnail": "thumbnail2.png",
+        "headline": "Wondering Hour: A Childhood Story, Grizzly Bears, and A Sunset in the Distance",
+        "author": "The Bees",
+        "date": "4 hours ago"
+      }
+    }
+  ],
+  "adin-component-search-paths": [],
+  "image-search-paths": [],
+  "vector-search-paths": []
+}

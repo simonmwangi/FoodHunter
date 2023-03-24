@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "948779057686",
+    "project_id": "foodhunter-ke",
+    "storage_bucket": "foodhunter-ke.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:948779057686:android:782b990ef6388c41266b37",
+        "android_client_info": {
+          "package_name": "com.ke.foodhunter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "948779057686-1eh3q8epc01gctcpvuc39d3chsdjdqa8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCqo6PJMWh1RUTQEsKaUAv0Zz8MM32OWT0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "948779057686-1eh3q8epc01gctcpvuc39d3chsdjdqa8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

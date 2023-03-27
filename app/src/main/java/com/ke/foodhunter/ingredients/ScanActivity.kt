@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.StrictMode
+import android.os.StrictMode.ThreadPolicy
 import android.provider.MediaStore
 import android.util.Log
 import android.view.Menu
@@ -21,15 +22,14 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.button.MaterialButton
-import com.google.firebase.database.*
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.TextRecognizer
 import com.ke.foodhunter.IngredientsInfoActivity
 import com.ke.foodhunter.R
 import com.ke.foodhunter.WebScraper
-import com.ke.foodhunter.WebScraperInfo
 import com.ke.foodhunter.data.FirebaseCallback
+import com.ke.foodhunter.data.Ingredient
 import com.ke.foodhunter.data.Response
 
 
@@ -56,8 +56,6 @@ class ScanActivity : AppCompatActivity() {
 
     private lateinit var textRecognizer: TextRecognizer
 
-    //Creating member variables
-    private lateinit var mFirebaseDatabase: DatabaseReference
 
     private lateinit var viewModel: IngredientsViewModel
 
@@ -80,8 +78,6 @@ class ScanActivity : AppCompatActivity() {
         cameraPermissions = arrayOf(android.Manifest.permission.CAMERA, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
         storagePermissions = arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
-        //Array for holding ingredients
-        val collectedIngredients = arrayOf("None")
 
         progressDialog = ProgressDialog(this)
         progressDialog.setTitle("Please Wait")
@@ -91,9 +87,9 @@ class ScanActivity : AppCompatActivity() {
 
         scrapDatabaseBtn.setOnClickListener {
             showToast("Clicked...")
-            val testData = mutableListOf<String>("Sugar","Salt")
+            val testData = arrayOf("Sugar","Salt")
 
-            getResponseUsingCallback()
+            getResponseUsingCallback(testData)
         }
         //On click
         inputImageBtn.setOnClickListener{
@@ -109,34 +105,78 @@ class ScanActivity : AppCompatActivity() {
         }
     }
 
-    private fun getResponseUsingCallback() {
+    //
+    private fun getResponseUsingCallback(searchList: Array<String>) {
+
         viewModel.getResponseUsingCallback(object : FirebaseCallback {
             override fun onResponse(response: Response) {
-                printResponse(response)
+                printResponseFromFirebase(response)
             }
-        })
+        },searchList)
 
     }
 
-    private fun printResponse(response: Response) {
-        response.ingredients?.let { products ->
-            products.forEach{ ingredient ->
-                /*
-                ingredient.title.let {
-                    Log.i("Test", it)
-                }
-                */
+    //This function gets the response from the async call and checks if the data is empty
+    private fun printResponseFromFirebase(response: Response) {
+        progressDialog.setMessage("Searching Online...")
+        val ingredients = response.ingredients
+        val remainder = response.remainingList
 
-                Log.i("Each Iterable","${ingredient.title} <> ${ingredient.description}")
+        if (remainder?.isEmpty() == true){
+            ingredients?.let {
+                progressDialog.dismiss()
+                displayIngredientsInformation(it) }
+        }
+        else {
+            progressDialog.setMessage("Still searching...\n might take a little longer")
+            //To avoid an exception thrown when the application tries to perform a network operation
+            //on the main thread
+            //Alternative is calling the network operation in a thread or asynch class
+            val policy = ThreadPolicy.Builder()
+                .permitAll().build()
+            StrictMode.setThreadPolicy(policy)
+            //Search the remaining ingredients in the Web Scraper
+            val fromScraperList = WebScraper().scrapFromWeb(remainder as MutableList<String>)
+            //then add them together with the found data
 
+            val combinedIngredientList = ingredients?.plus(fromScraperList)
+            if (combinedIngredientList != null) {
+                progressDialog.dismiss()
+                displayIngredientsInformation(combinedIngredientList)
+            }else{
+                progressDialog.dismiss()
+                displayIngredientsInformation(null)
+            }
+        }
+        response.ingredients?.let { list ->
+            list.forEach{ item ->
+
+                Log.i("Each Iterable","${item.title} <> ${item.description}")
             }
         }
 
+        //When a failure happens when fetching the data from the query
         response.exception?.let { exception ->
             exception.message?.let {
                 Log.e("Test", it)
             }
         }
+    }
+
+    //Display the collected list to IngredientsInfoActivity
+    private fun displayIngredientsInformation(ingredients: List<Ingredient>?) {
+        if (ingredients.isNullOrEmpty()){
+            showToast("No ingredients were found in the database")
+        }
+        else{
+            val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+            StrictMode.setThreadPolicy(policy)
+
+            val intent = Intent(this, IngredientsInfoActivity::class.java)
+            intent.putExtra("list", ingredients as java.io.Serializable)
+            startActivity(intent)   //Opens the IngredientsInfoActivity with the ingredients list
+        }
+
     }
 
     private fun recognizeTextFromImage(){
@@ -152,7 +192,6 @@ class ScanActivity : AppCompatActivity() {
 
             val textTaskResult = textRecognizer.process(inputImage)
                 .addOnSuccessListener { text ->
-                    progressDialog.dismiss()
 
                     val recognizedText = text.text
                     for (block in text.textBlocks){
@@ -186,20 +225,19 @@ class ScanActivity : AppCompatActivity() {
                                 return sb.toString()
                             }
 
-                            val cleanedList = mutableListOf<String>()
+                            var cleanedList = arrayOf<String>()
                             for(element in myIngredients){
-                                cleanedList.add(removeMultipleCharsFromString(element, "]#$[."))
+                                cleanedList += (removeMultipleCharsFromString(element, "]#$[."))
                             }
-                            getIngredientsInformation(cleanedList)
+
+                            //Calls the Callback function to start searching the ingredients list from the Firebase Database
+                            getResponseUsingCallback(cleanedList)
                         }
                         else{
                             Log.v("No Ingredients", "Not Found" )
                             showToast("No ingredients were found: Try Again...")
                         }
                     }
-
-
-
 
                     recognizedEditText.setText(recognizedText)
                 }
@@ -213,125 +251,6 @@ class ScanActivity : AppCompatActivity() {
             progressDialog.dismiss()
             showToast("Failed to prepare image due to ${e.message}")
         }
-    }
-
-
-    private fun scrapFromDatabase(myCallback: FirebaseCallback, searchArray: MutableList<String>): List<WebScraperInfo> {
-        mFirebaseDatabase = FirebaseDatabase.getInstance().getReference("Ingredients-List")
-
-        val ingredientsList = mutableListOf<WebScraperInfo>()
-        val array = searchArray.toTypedArray()
-
-        mFirebaseDatabase.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                /*
-                for(snap in snapshot.children){
-                    if(array.contains(snap.key.toString())){
-                        ingredientsList.add(WebScraperInfo(snap.key.toString(), snap.value.toString()))
-                        Log.v("Final Data 1","$ingredientsList")
-                    }
-                }
-                */
-                val snapshotList = snapshot.toString()
-                Log.v("Final Data 2","$ingredientsList")
-            }
-            override fun onCancelled(databaseError: DatabaseError) {
-                // Getting Post failed, log a message
-                Log.w("Err0r", "loadPost:onCancelled", databaseError.toException())
-                // ...
-            }
-        })
-
-        /*
-        /*
-        for(name in searchArray) {
-
-            mFirebaseDatabase.orderByKey().equalTo(name).get().addOnSuccessListener {
-                Log.v("Snapshot", it.toString())
-
-                    val title = it.key.toString()
-                    val description = it.value.toString()
-                    Log.v("Snapshot Data", "$title <> $description")
-                    ingredientsList.add(WebScraperInfo(title, description))
-
-                Log.v("Final Data 1", "<$ingredientsList>")
-            }
-            Log.v("Final Data 2", "<$ingredientsList>")
-        }
-        */
-         */
-        Log.v("Final Data 3","$ingredientsList")
-        return ingredientsList
-
-        /*
-        // Search for each ingredient in the database and print results
-        val size = array.size
-        var checker = 1
-        for (ingredient in  array) {
-            Log.v("CHECK 1", ingredientsList.toString())
-
-            mFirebaseDatabase.child("$ingredient").addListenerForSingleValueEvent(object :
-                ValueEventListener {
-
-                override fun onDataChange(dataSnapshot: DataSnapshot){
-                    Log.v("CHECK 2", ingredientsList.toString())
-                    if (dataSnapshot.exists()) {
-                        val title = dataSnapshot.key as String
-                        val description = dataSnapshot.value as String
-
-                        println("The ingredient: $title, the description: $description")
-                        val data = WebScraperInfo(title, description)
-                        ingredientsList += (data)
-                        println("The FUCKING ingredients list is now: $ingredientsList")
-                        Log.v("CHECK 3", ingredientsList.toString())
-                        //searchIngredients.remove(ingredient)
-                        //("The FUCKING search list is now: $searchIngredients")
-
-                        if (checker == size){
-                            Log.v("CHECK 5", ingredientsList.toString())
-
-                        }else{
-                            checker += 1
-                            Log.v("INT-NOW", checker.toString())
-                        }
-
-                    } else {
-                        println("Element not found")
-                        //showToast("The ingredient was not found")
-                    }
-                }
-
-                override fun onCancelled(databaseError: DatabaseError) {
-                    println("Database error: ${databaseError.message}")
-                }
-            })
-            Log.v("CHECK 4", ingredientsList.toString())
-        }
-        print("Before moving the data is: $ingredientsList")
-
-        return ingredientsList
-        */
-    }
-    private fun getIngredientsInformation( searchIngredients: MutableList<String>) {
-
-
-        // List of ingredient names to search for
-        //val searchIngredients = array.toList()
-        val testData = mutableListOf<String>("Sugar","Salt")
-        // TODO REmove this;:::
-        val obtainedFromFirebase = 0
-
-
-        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
-        StrictMode.setThreadPolicy(policy)
-        println("The searchlist: $searchIngredients")
-        val obtainedInfo = WebScraper().scrapFromWeb(searchIngredients)
-
-
-        println("The ingredientsList: $obtainedFromFirebase")
-        val intent = Intent(this, IngredientsInfoActivity::class.java)
-        intent.putExtra("list", obtainedFromFirebase as java.io.Serializable)
-        startActivity(intent)
     }
 
     private fun showInputImageDialog() {

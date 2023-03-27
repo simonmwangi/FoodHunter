@@ -1,10 +1,11 @@
 package com.ke.foodhunter
 
-import com.google.firebase.FirebaseApp
-import com.google.firebase.FirebaseOptions
-import com.google.firebase.database.*
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
-fun main(args: Array<String>) {
+fun main() {
 
     // Initialize Firebase app and database reference
     //val firebaseApp = FirebaseApp.initializeApp(

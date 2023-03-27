@@ -6,7 +6,7 @@ import com.ke.foodhunter.data.FirebaseCallback
 class IngredientsViewModel (
     private val repository: IngredientsRepository = IngredientsRepository()
     ): ViewModel() {
-        fun getResponseUsingCallback(callback: FirebaseCallback) {
-            repository.getResponseFromRealtimeDatabaseUsingCallback(callback)
+        fun getResponseUsingCallback(callback: FirebaseCallback, array: Array<String>) {
+            repository.getResponseFromRealtimeDatabaseUsingCallback(callback, array)
         }
 }

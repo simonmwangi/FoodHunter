@@ -3,4 +3,7 @@
     <string name="title_activity_welcome">WelcomeActivity</string>
     <string name="title_activity_scan">ScanActivity</string>
     <string name="title_activity_ingredients_info">IngredientsInfoActivity</string>
+    <string name="title_activity_user_options">UserOptionsActivity</string>
+    <string name="title_activity_user_goals">UserGoalsActivity</string>
+    <string name="title_activity_user_details">UserDetailsActivity</string>
 </resources>

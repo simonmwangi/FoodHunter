@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "948779057686",
+    "firebase_url": "https://foodhunter-ke-default-rtdb.firebaseio.com",
     "project_id": "foodhunter-ke",
     "storage_bucket": "foodhunter-ke.appspot.com"
   },
@@ -14,7 +15,15 @@
       },
       "oauth_client": [
         {
-          "client_id": "948779057686-1eh3q8epc01gctcpvuc39d3chsdjdqa8.apps.googleusercontent.com",
+          "client_id": "948779057686-dimq6rp6vmhmrt2ce4r87vjtppf6007s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ke.foodhunter",
+            "certificate_hash": "955e530037d32258b8d4f1891df9bed7d4c62e0e"
+          }
+        },
+        {
+          "client_id": "948779057686-7fji3lnduingd926mh2psdcscktjk1vp.apps.googleusercontent.com",
           "client_type": 3
         }
       ],

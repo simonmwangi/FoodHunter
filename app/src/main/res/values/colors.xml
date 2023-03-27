@@ -8,4 +8,22 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- My Colors -->
+    <!-- App Theme -->
+    <color name="background_theme">#062220</color>
+    <color name="button_color">#0b4f2d</color>
+    <color name="outline_color">#319c27</color>
+    <color name="header_color">#a6b266</color>
+    <color name="body_color">#e2b745</color>
+    <!-- Random Colors -->
+    <color name="color_1">#D32F2F</color>
+    <color name="color_2">#FFA000</color>
+    <color name="color_3">#0288D1</color>
+    <color name="color_4">#00796B</color>
+    <color name="color_5">#689F38</color>
+    <color name="color_6">#303F9F</color>
+
+
+
 </resources>

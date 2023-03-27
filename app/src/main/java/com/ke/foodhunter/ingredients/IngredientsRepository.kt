@@ -1,7 +1,6 @@
 package com.ke.foodhunter.ingredients
 
 import android.util.Log
-import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.ke.foodhunter.data.FirebaseCallback
@@ -9,34 +8,37 @@ import com.ke.foodhunter.data.Ingredient
 import com.ke.foodhunter.data.Response
 
 class IngredientsRepository (
-    private val ingredientRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("Ingredients-List")
+    private val ingredientRef: DatabaseReference = FirebaseDatabase.getInstance().getReference("Ingredients-List"),
+
 ){
-    fun getResponseFromRealtimeDatabaseUsingCallback(callback: FirebaseCallback) {
+    fun getResponseFromRealtimeDatabaseUsingCallback(callback: FirebaseCallback,searchIngredients : Array<String>) {
         Log.v("Repo Call","1" )
         ingredientRef.get().addOnCompleteListener { task ->
             val response = Response()
             if (task.isSuccessful) {
-                val result =  task.result
+                val result = task.result
 
 
-                val array = arrayOf("Sugar", "Salt", "Vitamin C")
-                var list = mutableListOf<Ingredient>()
-                array.forEach {
+                val list = mutableListOf<Ingredient>()
+                val remainingList = mutableListOf<String>()
+                searchIngredients.forEach {
 
-                    if (task.result.hasChild(it)){
+                    if (task.result.hasChild(it)) {
                         val key = result.child(it).key.toString()
                         val value = result.child(it).value.toString()
                         list += Ingredient(key, value)
-                        Log.i("Vars","Variables to save: Before: $key <> $value After: $list")
+                        Log.i("Vars", "Variables to save: Before: $key <> $value After: $list")
+                    }
+                    else{
+                        remainingList += it
                     }
                 }
-                response.ingredients = list
 
+                response.let {
+                    it.ingredients = list
+                    it.remainingList = remainingList
+                }
 
-                Log.v("Repo Call","2" )
-
-
-                Log.v("Repo Call","3 ${task.result.child("Sugar").value}" )
 
                 /*
                 * Can Prove Useful Sometime Later

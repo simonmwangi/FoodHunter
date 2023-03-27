@@ -1,26 +1,16 @@
 package com.ke.foodhunter
 
 import com.google.firebase.database.*
+import com.ke.foodhunter.data.Ingredient
 import org.jsoup.Jsoup
 
 
-data class WebScraperInfo(
-    val title: String,
-    val description: String
-): java.io.Serializable
 
 
-class WebScraper () {
+class WebScraper {
 
-    private lateinit var database: DatabaseReference
-
-    //Creating member variables
-    private var mFirebaseDatabase: DatabaseReference?=null
-    private var mFirebaseInstance: FirebaseDatabase?=null
-
-
-    fun scrapFromWeb(searchArray: MutableList<String>): List<WebScraperInfo> {
-        val ingredientsList = mutableListOf<WebScraperInfo>()
+    fun scrapFromWeb(searchArray: MutableList<String>): List<Ingredient> {
+        val ingredientsList = mutableListOf<Ingredient>()
         // Enter the name of the compound or nutrient to search for
         //val searchQuery = "Vitamin D"
         for (searchQuery in searchArray){
@@ -47,13 +37,13 @@ class WebScraper () {
             //val resultDoc = resultLink?.let { Jsoup.connect(it).get() }
             //print(resultLink)
 
-            ingredientsList += (WebScraperInfo(searchQuery,description?: "None Found"))
+            ingredientsList += (Ingredient(searchQuery,description?: "None Found"))
         }
         return ingredientsList
     }
 }
 fun main(){
-    val searchList = arrayOf("Flour","Calcium Sulphate" )
+    //val searchList = arrayOf("Flour","Calcium Sulphate" )
     //val test = WebScraper()
     //println(test.scrapFromWeb(searchList))
     //println(WebScraper().scrapFromDatabase(searchList, mFirebaseDatabase))

@@ -19,12 +19,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ke.foodhunter.ui.theme.FoodHunterTheme
 import androidx.compose.foundation.lazy.items
+import com.ke.foodhunter.data.Ingredient
 
 class IngredientsInfoActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val ingredientList: List<WebScraperInfo> = intent.getSerializableExtra("list") as List<WebScraperInfo>
+        val ingredientList: List<Ingredient> = intent.getSerializableExtra("list") as List<Ingredient>
         println("Here is your list: $ingredientList")
         setContent {
             FoodHunterTheme {
@@ -43,7 +44,7 @@ class IngredientsInfoActivity : ComponentActivity() {
 
 
 @Composable
-fun IngredientContent(ingredientList: List<WebScraperInfo>) {
+fun IngredientContent(ingredientList: List<Ingredient>) {
 
     val ingredients = remember {
         ingredientList
@@ -60,7 +61,7 @@ fun IngredientContent(ingredientList: List<WebScraperInfo>) {
 }
 
 @Composable
-fun IngredientListItem(item: WebScraperInfo) {
+fun IngredientListItem(item: Ingredient) {
     Row {
         Column() {
             Text(text = item.title, style = typography.h2)
@@ -76,9 +77,9 @@ fun IngredientListItem(item: WebScraperInfo) {
 fun DefaultPreview3() {
     FoodHunterTheme {
 
-        val testList = mutableListOf<WebScraperInfo>()
-        testList += (WebScraperInfo(title = "A", description = "Number 1"))
-        testList += (WebScraperInfo(title = "B", description = "Number 2"))
+        val testList = mutableListOf<Ingredient>()
+        testList += (Ingredient(title = "A", description = "Number 1"))
+        testList += (Ingredient(title = "B", description = "Number 2"))
         IngredientContent(ingredientList = testList)
     }
 }

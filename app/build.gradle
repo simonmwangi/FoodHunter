@@ -4,6 +4,7 @@ plugins {
     id 'kotlin-android'
     id 'com.google.relay' version '0.3.04'
     id 'com.google.gms.google-services'
+    id 'kotlin-parcelize'
 }
 
 
@@ -27,6 +28,8 @@ android {
 
     buildTypes {
         release {
+            buildConfigField "String", "EDAMAM_APP_ID", "a05fced1"
+            buildConfigField "String", "EDAMAM_APP_KEY", "904ac86d76d3935cde232791c2491bee"
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -75,5 +78,16 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.15.4'
     implementation 'com.google.android.gms:play-services-auth:20.4.1'
     implementation 'com.google.firebase:firebase-auth-ktx:21.0.3'
+    implementation("io.coil-kt:coil-compose:2.3.0")
+
+    implementation "androidx.compose.runtime:runtime-livedata:1.1.0"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.4.0-alpha02"
+    implementation "com.squareup.retrofit2:retrofit:2.9.0"
+    implementation "com.squareup.retrofit2:converter-gson:2.9.0"
+
+    implementation 'com.google.code.gson:gson:2.9.0'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.11.4'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.11.4'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.4'
 
 }

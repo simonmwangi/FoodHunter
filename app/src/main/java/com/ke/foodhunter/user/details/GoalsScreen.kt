@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -17,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.ke.foodhunter.R
@@ -24,7 +26,12 @@ import com.ke.foodhunter.component1.rubik
 
 
 @Composable
-fun OptionMenuWithCards() {
+fun OptionMenuWithCards(
+    viewModel: CombinedDataViewModel,
+    nav: NavController,
+    route1: String,
+    route2: String
+) {
     val (selectedOption, setSelectedOption) = remember { mutableStateOf(0) }
 
 
@@ -66,16 +73,29 @@ fun OptionMenuWithCards() {
             }
 
         }
+        val fromPreviousModel = viewModel.userData
+        Button(onClick = {
+            val addToModel = fromPreviousModel?.let { CombinedData(it.userChoice,it.username,
+                it.height, it.weight,it.ailments,it.restrictions,1,titleArray[selectedOption]) }
+            if (addToModel != null) {
+                viewModel.addToUserData(addToModel)
+            }
+            nav.navigate(route2)
+        }) {
+            Text(text="NEXT", color=Color.Black)
+
+        }
     }
 }
 
 @Composable
 fun GoalsScreen(
-        navController: NavController,
-        route1: String,
-        route2: String,
-        progress: MutableState<Float>
-    ) {
+    navController: NavController,
+    route1: String,
+    route2: String,
+    progress: MutableState<Float>,
+    viewModel: CombinedDataViewModel
+) {
         val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
         val backCallback = remember {
@@ -113,10 +133,10 @@ fun GoalsScreen(
                     textAlign = TextAlign.Left,
                     fontWeight = FontWeight(700.0.toInt()),
                 )
-                OptionMenuWithCards()
-                NextButton(nav = navController, route1 = route1, route2 = route2).NextButtons(
-                    progress,true
-                )
+                OptionMenuWithCards(viewModel = viewModel,nav = navController, route1 = route1, route2 = route2)
+//                NavigationButtons(nav = navController, route1 = route1, route2 = route2).NextButtons(
+//                    progress,true
+//                )
             }
         }
 
@@ -125,5 +145,11 @@ fun GoalsScreen(
 @Composable
 @Preview(showBackground = true)
 fun GoalsScreenPreview() {
-    GoalsScreen(navController = rememberNavController(),"","", progress = remember { mutableStateOf(0.0f) })
+    GoalsScreen(
+        navController = rememberNavController(),
+        "",
+        "",
+        progress = remember { mutableStateOf(0.0f) },
+        viewModel= viewModel()
+    )
 }

@@ -8,10 +8,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,6 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.google.relay.compose.ColumnScopeInstanceImpl.weight
@@ -36,12 +34,17 @@ fun OptionButton(
     title: String,
     nav: NavController,
     route: String,
-    progress: MutableState<Float>
+    progress: MutableState<Float>,
+    viewModel: CombinedDataViewModel
 ){
+    var getChoice by remember { mutableStateOf("") }
+
     Button(
         border = BorderStroke(2.dp, Color.Black),
         onClick = {
-            nav.navigate(route)
+            getChoice = title
+            viewModel.addToUserData(addData = CombinedData(userChoice = getChoice) )
+            nav.navigate(route = route)
             progress.value += 0.3f
             //startForResult.launch(googleSignInClient?.signInIntent)
         },
@@ -67,28 +70,32 @@ fun OptionButton(
 @Composable
 fun MyJetpackButtons(
     nav: NavController,
-    progress: MutableState<Float>
+    progress: MutableState<Float>,
+    viewModel: CombinedDataViewModel
 ) {
+
+
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        OptionButton(title ="Personal",nav,route=Screens.User.route,progress )
+        OptionButton(title ="Personal", nav, route=Screens.User.route, progress, viewModel)
         Spacer(modifier = Modifier.height(16.dp))
         OptionButton(
             title ="Family",
             nav = nav,
             route = Screens.Family.route,
-            progress = progress
+            progress = progress,viewModel
         )
         Spacer(modifier = Modifier.height(16.dp))
         OptionButton(
             title ="Someone Else",
             nav = nav,
             route = Screens.Options.route,
-            progress = progress
+            progress = progress,
+            viewModel = viewModel
         )
     }
 }
@@ -125,7 +132,11 @@ fun MainHeader(){
 }
 
 @Composable
-fun OptionsScreen(navController: NavController,progress: MutableState<Float>) {
+fun OptionsScreen(
+    navController: NavController,
+    progress: MutableState<Float>,
+    viewModel: CombinedDataViewModel
+) {
     Box(
         modifier = Modifier
             .background(bg_color)
@@ -135,7 +146,7 @@ fun OptionsScreen(navController: NavController,progress: MutableState<Float>) {
             verticalArrangement = Arrangement.SpaceEvenly
         ){
             MainHeader()
-            MyJetpackButtons(nav = navController,progress = progress)
+            MyJetpackButtons(nav = navController,progress = progress,viewModel)
             Spacer(modifier = Modifier.height(20.dp))
             //NextButton(nav = navController,route1=route1,route2=route2).NextButtons(progress,false)
         }
@@ -148,6 +159,10 @@ fun OptionsScreen(navController: NavController,progress: MutableState<Float>) {
 fun OptionsScreenPreview() {
     FoodHunterTheme {
 
-        OptionsScreen(navController = rememberNavController(),progress = remember { mutableStateOf(0.0f) })
+        OptionsScreen(
+            navController = rememberNavController(),
+            progress = remember { mutableStateOf(0.0f) },
+            viewModel = viewModel()
+        )
     }
 }

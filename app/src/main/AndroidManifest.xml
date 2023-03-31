@@ -17,6 +17,11 @@
         android:theme="@style/Theme.FoodHunter"
         tools:targetApi="31">
         <activity
+            android:name=".recipes.DiscoverRecipesActivity"
+            android:exported="false"
+            android:label="@string/title_activity_discover_recipes"
+            android:theme="@style/Theme.FoodHunter" />
+        <activity
             android:name=".user.details.UserDetailsActivity"
             android:exported="false"
             android:label="@string/title_activity_user_details"

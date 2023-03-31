@@ -1,6 +1,7 @@
 package com.ke.foodhunter.user.details
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +15,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.ke.foodhunter.R
@@ -37,6 +39,8 @@ class UserDetailsActivity : ComponentActivity() {
                 }
             }
             */
+
+
             val changeProgress = rememberSaveable { mutableStateOf(0.1f) }
             FoodHunterTheme {
                 // A surface container using the 'background' color from the theme
@@ -58,4 +62,7 @@ class UserDetailsActivity : ComponentActivity() {
             }
         }
     }
+
+
 }
+

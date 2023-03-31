@@ -1,44 +1,68 @@
 package com.ke.foodhunter
 
-import android.net.Uri
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.ke.foodhunter.component1.rubik
 import com.ke.foodhunter.hellocard.montserrat
+import com.ke.foodhunter.ingredients.ScanActivity
+import com.ke.foodhunter.recipes.DiscoverRecipesActivity
 import com.ke.foodhunter.ui.theme.FoodHunterTheme
+import com.ke.foodhunter.user.details.CombinedData
 
 data class Utility(
     val title: String,
     @DrawableRes val iconId: Int,
-    val backgroundColor: Color
+    val backgroundColor: Color,
+    val intent: Class<*>
 )
 
 
 class MainActivity : ComponentActivity() {
-    private var imageUri: Uri? = null
-    private var extractedText: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val mAuth = FirebaseAuth.getInstance()  //get current user instance
+
+        val defaultName = mAuth.currentUser?.displayName.toString()      //get the full name of the user instance
+
+        //val bundle = intent?.getBundleExtra("bundle")
+        val parcelable = intent?.extras?.getParcelable<CombinedData>("save_data")   //
+
+        if (parcelable != null){    //if the intent call contained a parcelable object then call savePersonalDetails() fun
+            Log.i("Checker" ,"Not Null")
+            savePersonalDetails(parcelable,mAuth)
+        }
+
         setContent {
             FoodHunterTheme {
                 // A surface container using the 'background' color from the theme
@@ -46,9 +70,54 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    HomeScreen()
+                    HomeScreen(currentUser = defaultName, onLogoutClick = { onLogoutClick(mAuth) })
                 }
             }
+        }
+    }
+
+    //Save user personal details from collected parcelable object
+    private fun savePersonalDetails(parcelable: CombinedData, mAuth: FirebaseAuth,) {
+        val database: FirebaseFirestore = FirebaseFirestore.getInstance()
+        val saveHashMap = HashMap<String,Any>()
+
+        saveHashMap["choice"] = parcelable.userChoice
+        saveHashMap["username"] = parcelable.username
+        saveHashMap["height"] = parcelable.height
+        saveHashMap["weight"] = parcelable.weight
+        saveHashMap["ailments"] = parcelable.ailments
+        saveHashMap["restrictions"] = parcelable.restrictions
+        saveHashMap["familyNo"] = parcelable.familyNo
+        saveHashMap["mainGoal"] = parcelable.mainGoal
+
+        database.collection("users/${mAuth.currentUser?.uid}").document("personal")
+            .set(saveHashMap)
+            .addOnSuccessListener {
+                Toast.makeText(this,"You are all set! ",Toast.LENGTH_LONG).show()
+            }
+            .addOnFailureListener {
+                Toast.makeText(this," Error in adding personal data. ",Toast.LENGTH_LONG).show()
+            }
+    }
+
+    private fun onLogoutClick(mAuth: FirebaseAuth) {
+
+        val googleSignInClient : GoogleSignInClient
+
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.default_web_client_id))
+            .requestEmail()
+            .build()
+        googleSignInClient = GoogleSignIn.getClient(this,gso)
+
+        //Sign out
+        mAuth.signOut()
+        googleSignInClient.signOut().addOnSuccessListener {
+            Toast.makeText(this, "Successfully Signed Out",Toast.LENGTH_SHORT ).show()
+            val intent = Intent(this, WelcomeActivity::class.java)
+            startActivity(intent)
+        }.addOnFailureListener {
+            Toast.makeText(this, "Signing Out Failed. Try Again", Toast.LENGTH_SHORT).show()
         }
     }
 }
@@ -56,18 +125,17 @@ class MainActivity : ComponentActivity() {
 //Will display the HomeScreen UI
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun HomeScreen() {
-    // this is the most outer box that will
-    // contain all the views,buttons,chips,etc.
+fun HomeScreen(onLogoutClick: () -> Unit,currentUser: String?) {
+
     Box(
         modifier = Modifier
             .background(Color.DarkGray)
             .fillMaxSize()
     ) {
         Column {
-            // this is how we call
-            // function adding whole UI
-            GreetingSection()
+            if (currentUser != null) {
+                GreetingSection(onLogoutClick, name = currentUser)
+            }
 
             //
             SuggestionSection()
@@ -77,32 +145,38 @@ fun HomeScreen() {
                     Utility(
                         title = "Create Meal Plan",
                         R.drawable.plate_restaurant_svg,
-                        Color(R.color.color_1)
+                        Color(R.color.color_1),
+                        MainActivity::class.java
                     ),
                     Utility(
                         title = "Discover Recipes",
                         R.drawable.recipes_svg,
-                        Color(R.color.color_2)
+                        Color(R.color.color_2),
+                        DiscoverRecipesActivity::class.java
                     ),
                     Utility(
                         title = "Scan Ingredients",
                         R.drawable.scan_svgrepo_com,
-                        Color(R.color.color_3)
+                        Color(R.color.color_3),
+                        ScanActivity::class.java
                     ),
                     Utility(
                         title = "My Market",
                         R.drawable.shopping_bag_svg,
-                        Color(R.color.color_4)
+                        Color(R.color.color_4),
+                        MainActivity::class.java
                     ),
                     Utility(
                         title = "Ask Anything",
                         R.drawable.question_circle_svg,
-                        Color(R.color.color_5)
+                        Color(R.color.color_5),
+                        MainActivity::class.java
                     ),
                     Utility(
                         title = "My Account",
                         R.drawable.user_square_svg,
-                        Color(R.color.color_6)
+                        Color(R.color.color_6),
+                        MainActivity::class.java
                     )
                 )
             )
@@ -114,6 +188,8 @@ fun HomeScreen() {
 fun UtilityItem(
     utility: Utility
 ) {
+    val context = LocalContext.current
+
     BoxWithConstraints(
         // Box with some attributes
         modifier = Modifier
@@ -121,11 +197,12 @@ fun UtilityItem(
             .aspectRatio(1f)
             .clip(RoundedCornerShape(5.dp))
             .background(Color.White)
+            .clickable {
+
+                context.startActivity(Intent(context,utility.intent))
+            }
     ) {
 
-        // so , we have done with texture and
-        // now just creating box and other things
-        // box containing course elements
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -136,7 +213,8 @@ fun UtilityItem(
                 painter = painterResource(id = utility.iconId),
                 contentDescription = utility.title,
                 tint = Color.White,
-                modifier = Modifier.align(Alignment.TopStart)
+                modifier = Modifier
+                    .align(Alignment.TopStart)
                     .padding(10.dp)
                     .size(80.dp, 80.dp)
             )
@@ -145,26 +223,10 @@ fun UtilityItem(
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.h5,
                 lineHeight = 26.sp,
-                modifier = Modifier.align(Alignment.BottomStart)
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
                     .padding(10.dp)
             )
-            /*
-            Text(
-                text = "Start",
-                color = Color.White,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .clickable {
-                        // Handle the clicks
-                    }
-                    .align(Alignment.BottomEnd)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(Color.Green)
-                    .padding(vertical = 6.dp, horizontal = 15.dp)
-            )
-
-             */
         }
     }
 }
@@ -186,12 +248,8 @@ fun UtilitiesSection(utilities: List<Utility>) {
             modifier = Modifier.fillMaxHeight()
         ) {
             items(utilities.size) {
-                // here we have to define how one of these item is look like
-                // we will tell after defining item design
-                // let me comment it for now and after
-                // creating you just have to remove
 
-                UtilityItem(utility = utilities[it])
+                UtilityItem(utility = utilities[it])    //Every card in the dashboard
             }
         }
     }
@@ -201,26 +259,28 @@ fun UtilitiesSection(utilities: List<Utility>) {
 //Screen Header
 @Composable
 fun GreetingSection(
+    logout: () -> Unit,
     name: String = "User"
+
 ) {
+    val thisContext = LocalContext.current
     // here we just arrange the views
     Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
             .padding(15.dp)
     ) {
         Column(
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Top
         ) {
             // heading text view
             Text(
                 text = "Food-Hunter",
                 style = MaterialTheme.typography.h4,
                 fontFamily = montserrat,
-                fontWeight = FontWeight.ExtraBold,
-                modifier = Modifier.fillMaxWidth()
+                fontWeight = FontWeight.ExtraBold
             )
             Text(
                 text = "Good morning, $name",
@@ -231,13 +291,33 @@ fun GreetingSection(
                 style = MaterialTheme.typography.body1
             )
         }
-        // search icon
-        Icon(
-            painter = painterResource(id = R.drawable.baseline_settings_24),
-            contentDescription = "Search",
-            tint = Color.White,
-            modifier = Modifier.size(24.dp)
-        )
+        // settings icon
+        var showMenu by remember { mutableStateOf(false) }
+        IconButton(onClick = { showMenu = true }, modifier = Modifier.padding(end=10.dp).align(alignment = Alignment.Top)) {
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_settings_24),
+                contentDescription = "Search",
+                tint = Color.White,
+                modifier = Modifier.size(24.dp)
+
+
+            )
+            if (showMenu) {
+                DropdownMenu(
+                    expanded = true,
+                    onDismissRequest = { showMenu = false }
+                ) {
+                    DropdownMenuItem(onClick = {
+                        showMenu = false
+                        logout()
+                    }) {
+                        Text("LOGOUT")
+                    }
+                }
+            }
+        }
+
+
     }
 }
 
@@ -256,7 +336,6 @@ fun SuggestionSection(
             .fillMaxWidth()
     ) {
         Column {
-            // here are two text views or we can say only text
             Text(
                 text = "Weekly Plan",
                 style = MaterialTheme.typography.h3
@@ -294,6 +373,6 @@ fun SuggestionSection(
 fun DefaultPreview() {
     FoodHunterTheme {
         //ConversionWindow()
-        HomeScreen()
+        HomeScreen(onLogoutClick = {},"User")
     }
 }

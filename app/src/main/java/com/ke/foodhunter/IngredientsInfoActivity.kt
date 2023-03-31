@@ -3,10 +3,7 @@ package com.ke.foodhunter
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.MaterialTheme.typography
@@ -64,8 +61,9 @@ fun IngredientContent(ingredientList: List<Ingredient>) {
 fun IngredientListItem(item: Ingredient) {
     Row {
         Column() {
-            Text(text = item.title, style = typography.h2)
-            Text(text = item.description, style = typography.h6)
+            Text(text = item.title, style = typography.h4)
+            Text(text = item.description, style = typography.body1)
+            Spacer(modifier = Modifier.height(10.dp))
 
         }
     }

@@ -19,6 +19,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.text.isDigitsOnly
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.ke.foodhunter.R
@@ -26,7 +28,10 @@ import com.ke.foodhunter.component1.rubik
 
 @Composable
 fun FamilyDataFields() {
-    var family_no by remember { mutableStateOf(0) }
+    val defaultValue: Int = 1
+    val maxValue: Int = 10
+
+    var familyNo by remember { mutableStateOf(defaultValue.toString()) }
     var ailments by remember { mutableStateOf("") }
     var restrictions by remember { mutableStateOf("") }
     Column(
@@ -40,13 +45,20 @@ fun FamilyDataFields() {
                 //backgroundColor = Color.White, // does not work
                 textColor = Color.Black
             ),
-            value = family_no.toString(), // #1
+            value = familyNo, // #1
             textStyle = TextStyle.Default.copy(fontSize=20.sp),
-            onValueChange = {newText ->
-                family_no = newText.toInt() }, // #2
+            onValueChange = {it ->
+                if (it.isDigitsOnly()) {
+                    val value = it.toIntOrNull() ?: 0
+                    if (value <= maxValue) {
+                        familyNo = value.toString()
+                    }
+                }
+            }, // #2
             placeholder = { Text("Number of Members") },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number),
+            singleLine = true,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(70.dp)
@@ -89,7 +101,13 @@ fun FamilyDataFields() {
 }
 
 @Composable
-fun FamilyScreen(navController: NavController, route1: String, route2:String, progress: MutableState<Float>){
+fun FamilyScreen(
+    navController: NavController,
+    route1: String,
+    route2: String,
+    progress: MutableState<Float>,
+    viewModel: CombinedDataViewModel
+){
     Column {
         Text(
             text = "Fill in your family's details here.",
@@ -107,11 +125,17 @@ fun FamilyScreen(navController: NavController, route1: String, route2:String, pr
             )
         )
         FamilyDataFields()
-        NextButton(nav = navController, route1 = route1, route2 = route2).NextButtons(progress,true)
+        NavigationButtons(nav = navController, route1 = route1, route2 = route2).NextButtons(progress,true)
     }
 }
 @Composable
 @Preview(showBackground = true)
 fun FamilyScreenPreview(){
-    FamilyScreen(navController = rememberNavController(),"","", progress = remember { mutableStateOf(0.0f) })
+    FamilyScreen(
+        navController = rememberNavController(),
+        "",
+        "",
+        progress = remember { mutableStateOf(0.0f) },
+        viewModel = viewModel()
+    )
 }

@@ -4,27 +4,28 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.animation.OvershootInterpolator
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -36,6 +37,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.ke.foodhunter.data.User
 import com.ke.foodhunter.ui.theme.FoodHunterTheme
 import com.ke.foodhunter.user.details.UserDetailsActivity
+import kotlinx.coroutines.delay
 
 class WelcomeActivity : ComponentActivity() {
 
@@ -50,12 +52,16 @@ class WelcomeActivity : ComponentActivity() {
 
         mAuth = FirebaseAuth.getInstance()
 
+        val currentUser = mAuth.currentUser
+
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.default_web_client_id))
             .requestEmail()
             .build()
 
         googleSignInClient = GoogleSignIn.getClient(this,gso)
+
+
 
         setContent {
             FoodHunterTheme {
@@ -64,7 +70,9 @@ class WelcomeActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    Logo(LocalContext.current)
+                    val appContext = LocalContext.current
+
+                    WelcomeScreen(appContext, currentUser) { signIn() }
                 }
             }
         }
@@ -117,6 +125,8 @@ class WelcomeActivity : ComponentActivity() {
                         .set(currentUser)
                         .addOnSuccessListener {
                             //onSignInSuccess()
+                            val intent = Intent(this, UserDetailsActivity::class.java)
+                            startActivity(intent)
                         }
                         .addOnFailureListener { exception ->
                             Toast.makeText(this, "Error creating user: ${exception.message}", Toast.LENGTH_SHORT).show()
@@ -128,120 +138,100 @@ class WelcomeActivity : ComponentActivity() {
 
             }
     }
-}
 
+}
 
 @Composable
-fun Logo(context: Context) {
-
-    Column (horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxSize()
-    ){
-        Text(text = "Food-Hunter",
-            fontSize = 30.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .padding(all=5.dp)
-                )
-        Image(painter = painterResource(id = R.drawable.ic_launcher_background),
-            contentDescription = "logo-space",
-            modifier = Modifier
-                .size(200.dp)
-                .clip(CircleShape)
-                .border(
-                    width = 2.dp,
-                    color = Color.Red,
-                    shape = CircleShape
-                ),
-            contentScale = ContentScale.Crop
-        )
-        Row {
-            Text(text = "Prepare yourself...",
-                fontSize = 20.sp
-            )
-        }
-        /*
-        Might Prove Useful Later
-        var visible by remember {
-            mutableStateOf(true)
-        }
-        Box(
-            modifier = Modifier
-                .padding(top = 20.dp)
-                .size(56.dp)
-                .clip(CircleShape)
-                .background(color = Color.Green)
-                .clickable(
-                    onClick = {
-                        Toast
-                            .makeText(context, "OnClick", Toast.LENGTH_LONG)
-                            .show()
-                        Log.v("OnClick", "OnClick")
-                        visible = !visible
-                        GlobalScope.launch {
-                            //delay(2000)
-                            //context.startActivity(Intent(context, ScanActivity::class.java))
-                            visible = true
-                        }
-
-                    }
-                ),
-            contentAlignment = Alignment.Center
-        )
-        {
-
-            if (visible) {
-                Image(painterResource(id = R.drawable.arrow_forward),
-                    alignment = Alignment.Center,
-                    contentDescription = "next activity")
-                Text(text = "Prepare yourself...",
-                    fontSize = 20.sp
-                )
-
-            }else {
-                visible=false
-                CircularProgressIndicator(
-                    color = Color.White,
-                    modifier = Modifier
-                        .size(50.dp),
-                    strokeWidth = 5.dp
-
-                )
-            }
-
-
-
-        }
-        */
-        Button(
-            onClick = {
-                //startForResult.launch(googleSignInClient?.signInIntent)
-                context.startActivity(Intent(context, UserDetailsActivity::class.java))
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp),
-            shape = RoundedCornerShape(6.dp),
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color.Green
-            )
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.google_color_icon),
-                contentDescription = ""
-            )
-            Text(text = "Sign in with Google", modifier = Modifier.padding(6.dp))
-        }
+fun WelcomeScreen(context: Context, currentUser: FirebaseUser?, signIn: ()-> Unit ) {
+    val colors = listOf(
+        Color(0xFF062220), // Purple
+        Color(0xFF0B4F2D), // Light blue
+        Color(0xFFE2B745)  // Purple
+    )
+    val gradient = Brush.linearGradient(
+        0.0f to colors[0],
+        500.0f to colors[1],
+        start = Offset.Zero,
+        end = Offset.Infinite
+    )
+    var user by remember {
+        mutableStateOf(currentUser)
+    }
+    var check by remember {
+        mutableStateOf(false)
     }
 
+    Box(modifier = Modifier
+        .fillMaxHeight()
+        .fillMaxWidth()
+        .background(gradient)
+    ) {
+
+        var scale = remember {
+            androidx.compose.animation.core.Animatable(0.0f)
+        }
+        LaunchedEffect(key1 = true) {
+            scale.animateTo(
+                targetValue = 0.7f,
+                animationSpec = tween(800, easing = {
+                    OvershootInterpolator(4f).getInterpolation(it)
+                })
+            )
+            if(user != null) {
+                delay(1000)
+                context.startActivity(Intent(context, MainActivity::class.java))
+            } else{
+                check = true
+            }
+        }
+
+
+
+        Image(
+            painter = painterResource(id = R.drawable.app_logo),
+            contentDescription = "",
+            alignment = Alignment.TopCenter, modifier = Modifier
+                .fillMaxSize()
+                .padding(40.dp)
+                .scale(scale.value)
+            )
+        Button(
+            onClick = {
+                      signIn()
+                      //context.startActivity(Intent(context, UserDetailsActivity::class.java))
+            },
+            enabled = check,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp)
+                .align(Alignment.Center)
+                .width(100.dp),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = colors[2]
+            )
+        ) {
+            Text("Sign In", color = Color.White, fontWeight = FontWeight.Bold)
+        }
+
+
+        Text(
+            text = "Version - ${BuildConfig.VERSION_NAME}",
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.caption,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(16.dp)
+        )
+    }
 }
+
+
 
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun DefaultPreview2() {
     FoodHunterTheme {
-        Logo(context = LocalContext.current)
+        WelcomeScreen(context = LocalContext.current, currentUser = null, signIn = {})
     }
 }

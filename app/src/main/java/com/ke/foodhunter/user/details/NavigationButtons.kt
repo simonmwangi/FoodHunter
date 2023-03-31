@@ -17,9 +17,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
-class NextButton(private val nav : NavController,
-                 private val route1: String,
-                 private val route2: String
+class NavigationButtons(private val nav : NavController,
+                        private val route1: String,
+                        private val route2: String
 ) {
 
     @Composable

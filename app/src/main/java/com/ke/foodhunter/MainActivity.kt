@@ -129,7 +129,6 @@ fun HomeScreen(onLogoutClick: () -> Unit,currentUser: String?) {
 
     Box(
         modifier = Modifier
-            .background(Color.DarkGray)
             .fillMaxSize()
     ) {
         Column {
@@ -138,44 +137,44 @@ fun HomeScreen(onLogoutClick: () -> Unit,currentUser: String?) {
             }
 
             //
-            SuggestionSection()
+            //SuggestionSection()
 
             UtilitiesSection(
                 utilities = listOf(
                     Utility(
                         title = "Create Meal Plan",
                         R.drawable.plate_restaurant_svg,
-                        Color(R.color.color_1),
+                        MaterialTheme.colors.surface,
                         MainActivity::class.java
                     ),
                     Utility(
                         title = "Discover Recipes",
                         R.drawable.recipes_svg,
-                        Color(R.color.color_2),
+                        MaterialTheme.colors.surface,
                         DiscoverRecipesActivity::class.java
                     ),
                     Utility(
                         title = "Scan Ingredients",
                         R.drawable.scan_svgrepo_com,
-                        Color(R.color.color_3),
+                        MaterialTheme.colors.surface,
                         ScanActivity::class.java
                     ),
                     Utility(
                         title = "My Market",
                         R.drawable.shopping_bag_svg,
-                        Color(R.color.color_4),
+                        MaterialTheme.colors.surface,
                         MainActivity::class.java
                     ),
                     Utility(
                         title = "Ask Anything",
                         R.drawable.question_circle_svg,
-                        Color(R.color.color_5),
+                        MaterialTheme.colors.surface,
                         MainActivity::class.java
                     ),
                     Utility(
                         title = "My Account",
                         R.drawable.user_square_svg,
-                        Color(R.color.color_6),
+                        MaterialTheme.colors.surface,
                         MainActivity::class.java
                     )
                 )
@@ -196,7 +195,7 @@ fun UtilityItem(
             .padding(7.5.dp)
             .aspectRatio(1f)
             .clip(RoundedCornerShape(5.dp))
-            .background(Color.White)
+            .background(MaterialTheme.colors.onBackground)
             .clickable {
 
                 context.startActivity(Intent(context,utility.intent))
@@ -279,12 +278,11 @@ fun GreetingSection(
             Text(
                 text = "Food-Hunter",
                 style = MaterialTheme.typography.h4,
-                fontFamily = montserrat,
-                fontWeight = FontWeight.ExtraBold
             )
             Text(
                 text = "Good morning, $name",
-                style = MaterialTheme.typography.h5
+                style = MaterialTheme.typography.h5,
+                //fontFamily = rubik,
             )
             Text(
                 text = "We wish you have a good day!",

@@ -8,9 +8,11 @@ class RecipeApiImpl(private val recipeApi: RecipeApi) {
         health: String?,
         ingr: Int?,
         from: Int?,
-        to: Int?
+        to: Int?,
+        type: String
     ): List<Recipe> {
-        val response = recipeApi.searchRecipes(appId, appKey, query, health, ingr, from, to)
+        val response = recipeApi.searchRecipes(appId, appKey, query, health, ingr, from, to, type)
         return response.hits.map { it.recipe }
     }
 }
+

@@ -1,5 +1,8 @@
 package com.ke.foodhunter.recipes
 
+import android.content.Context
+import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.CreationExtras
 import kotlinx.coroutines.launch
@@ -10,18 +13,26 @@ class RecipeViewModel(private val recipeApi: RecipeApiImpl) : ViewModel() {
     val recipes: LiveData<List<Recipe>>
         get() = _recipes
 
-    fun searchRecipes(query: String, health: String?, ingr: Int?) {
+    fun searchRecipes(query: String, health: String?, ingr: Int?, context: Context) {
         viewModelScope.launch {
-            val recipes = recipeApi.searchRecipes(
-                appId = "YOUR_APP_ID",
-                appKey = "YOUR_APP_KEY",
-                query = query,
-                health = health,
-                ingr = ingr,
-                from = null,
-                to = null
-            )
-            _recipes.value = recipes
+            try {
+                val recipes = recipeApi.searchRecipes(
+                    appId = "a05fced1",
+                    appKey = "904ac86d76d3935cde232791c2491bee",
+                    query = query,
+                    health = health,
+                    ingr = ingr,
+                    from = 0,
+                    to = 1,
+                    type = "public"
+                )
+                _recipes.value = recipes
+            }catch(error: Exception){
+                Log.e("Fetch Error","Crashed with the following error: $error" )
+                Toast.makeText(context,"An error occured. Check your internet connection.", Toast.LENGTH_SHORT).show()
+            }
+
+
         }
     }
 }

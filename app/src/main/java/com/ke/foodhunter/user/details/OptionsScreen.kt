@@ -26,7 +26,7 @@ import com.ke.foodhunter.component1.*
 import com.ke.foodhunter.ui.theme.FoodHunterTheme
 import com.ke.foodhunter.R
 import com.ke.foodhunter.hellocard.montserrat
-val btn_color = Color(R.color.button_color)
+val btn_color = Color(R.color.color_1)
 val bg_color = Color(R.color.background_theme)
 
 @Composable

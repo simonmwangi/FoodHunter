@@ -2,21 +2,36 @@ package com.ke.foodhunter.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.MaterialTheme.shapes
+import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
-import com.ke.foodhunter.user.details.ui.theme.*
 
 private val DarkColorPalette = darkColors(
-    primary = LightGreen,
-    primaryVariant = DarkGreen,
-    secondary = LightBrown
+    //main background color
+    primary = primaryCharcoal,
+    //used for text color
+    secondary = textColorDark,
+    //background of sudoku board
+    surface = lightGreyAlpha,
+    //grid lines of sudoku board
+    primaryVariant = gridLineColorLight,
+    onPrimary = accentAmber,
+    onSurface = accentAmber,
+    background = secondaryGreen,
+    onBackground = onBackgroundDark
 )
 
 private val LightColorPalette = lightColors(
-    primary = SemiGreen,
-    primaryVariant = DarkGreen,
-    secondary = LightGrey
+    primary = primaryGreen,
+    secondary = textColorLight,
+    surface = lightGrey,
+    primaryVariant = gridLineColorLight,
+    onPrimary = textColorDark,
+    onSurface = accentAmber,
+    background = lightBrown,
+    onBackground = onBackgroundLight
 
     /* Other default colors to override
     background = Color.White,
@@ -30,7 +45,14 @@ private val LightColorPalette = lightColors(
 
 @Composable
 fun FoodHunterTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
-    val colors = if (darkTheme) {
+
+    MaterialTheme(
+        colors = if (darkTheme) DarkColorPalette else LightColorPalette,
+        typography = Typography,
+        shapes = shapes,
+        content = content
+    )
+   /* val colors = if (darkTheme) {
         DarkColorPalette
     } else {
         LightColorPalette
@@ -41,5 +63,5 @@ fun FoodHunterTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Compos
         typography = Typography,
         shapes = Shapes,
         content = content
-    )
+    )*/
 }

@@ -76,6 +76,7 @@ fun RecipeListScreen(recipes: List<MyRecipe>, onAddRecipeClick: () -> Unit) {
     }
 }
 
+
 @Composable
 fun RecipeCard(recipe: MyRecipe) {
     Card(
@@ -92,8 +93,8 @@ fun RecipeCard(recipe: MyRecipe) {
 
             AsyncImage(
                 model = recipe.image,
-                placeholder = painterResource(id = R.drawable.ic_launcher_background),
-                //error = painterResource()
+                placeholder = painterResource(id = R.drawable.image_placeholder),
+                error = painterResource(id = R.drawable.image_placeholder),
                 modifier = Modifier
                     .height(120.dp)
                     .fillMaxWidth(),

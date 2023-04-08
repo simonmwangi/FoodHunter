@@ -13,7 +13,8 @@ class RecipeViewModel(private val recipeApi: RecipeApiImpl) : ViewModel() {
     val recipes: LiveData<List<Recipe>>
         get() = _recipes
 
-    fun searchRecipes(query: String, health: String?, ingr: Int?, context: Context) {
+    fun searchRecipes(query: String, health: String?, ingr: Int?,diet: String?,
+                      cuisineType: String?,mealType: String?, dishType: String?, calories: String?,  context: Context) {
         viewModelScope.launch {
             try {
                 val recipes = recipeApi.searchRecipes(
@@ -24,6 +25,11 @@ class RecipeViewModel(private val recipeApi: RecipeApiImpl) : ViewModel() {
                     ingr = ingr,
                     from = 0,
                     to = 1,
+                    diet = diet,
+                    cuisineType = cuisineType,
+                    mealType = mealType,
+                    dishType = dishType,
+                    calories = calories,
                     type = "public"
                 )
                 _recipes.value = recipes

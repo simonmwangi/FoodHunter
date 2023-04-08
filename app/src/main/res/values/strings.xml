@@ -7,4 +7,5 @@
     <string name="title_activity_user_goals">UserGoalsActivity</string>
     <string name="title_activity_user_details">UserDetailsActivity</string>
     <string name="title_activity_discover_recipes">DiscoverRecipesActivity</string>
+    <string name="title_activity_create_recipe">CreateRecipeActivity</string>
 </resources>

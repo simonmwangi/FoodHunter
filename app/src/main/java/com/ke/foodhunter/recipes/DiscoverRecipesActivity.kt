@@ -1,14 +1,27 @@
 package com.ke.foodhunter.recipes
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ExtendedFloatingActionButton
+import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.ke.foodhunter.recipes.ui.theme.FoodHunterTheme
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -41,21 +54,37 @@ class DiscoverRecipesActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             FoodHunterTheme{
-                    RecipeApp(recipeViewModel)
+                RecipeApp(recipeViewModel)
+                AddRecipe()
             }
         }
     }
 }
 
 @Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
+fun AddRecipe(){
+    val context = LocalContext.current
+
+    Box(modifier = Modifier.fillMaxSize()) {
+
+        ExtendedFloatingActionButton(
+            modifier = Modifier
+                .padding(all = 16.dp)
+                .align(alignment = Alignment.BottomEnd)
+                .clickable{},
+            onClick = {
+                Toast.makeText(context, "Add Recipe", Toast.LENGTH_SHORT).show()
+                context.startActivity(Intent(context, CreateRecipeActivity::class.java))
+            },
+            text = { Text(text = "Share a Recipe.") },
+            icon = { Icon(imageVector = Icons.Filled.Add, contentDescription = "Add") })
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview4() {
     FoodHunterTheme {
-        Greeting("Android")
+        AddRecipe()
     }
 }

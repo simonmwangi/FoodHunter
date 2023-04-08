@@ -13,6 +13,11 @@ interface RecipeApi {
         @Query("ingr") ingr: Int?,
         @Query("from") from: Int?,
         @Query("to") to: Int?,
+        @Query("diet") diet: String?,
+        @Query("cuisineType") cuisineType: String?,
+        @Query("mealType") mealType: String?,
+        @Query("dishType") dishType: String?,
+        @Query("calories") calories	: String?,
         @Query("type") type: String
     ): RecipeSearchResponse
 }

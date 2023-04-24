@@ -17,21 +17,17 @@ private val DarkColorPalette = darkColors(
     surface = lightGreyAlpha,
     //grid lines of sudoku board
     primaryVariant = gridLineColorLight,
-    onPrimary = accentAmber,
-    onSurface = accentAmber,
-    background = secondaryGreen,
-    onBackground = onBackgroundDark
+    onPrimary = accentDark,
+    //onSurface = accentAmber
 )
 
 private val LightColorPalette = lightColors(
-    primary = primaryGreen,
+    primary = primaryLight,
     secondary = textColorLight,
     surface = lightGrey,
     primaryVariant = gridLineColorLight,
-    onPrimary = textColorDark,
-    onSurface = accentAmber,
-    background = lightBrown,
-    onBackground = onBackgroundLight
+    onPrimary = accentLight,
+    //onSurface = accentAmber
 
     /* Other default colors to override
     background = Color.White,
@@ -48,7 +44,7 @@ fun FoodHunterTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Compos
 
     MaterialTheme(
         colors = if (darkTheme) DarkColorPalette else LightColorPalette,
-        typography = Typography,
+        typography = typography,
         shapes = shapes,
         content = content
     )

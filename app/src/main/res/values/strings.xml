@@ -8,4 +8,6 @@
     <string name="title_activity_user_details">UserDetailsActivity</string>
     <string name="title_activity_discover_recipes">DiscoverRecipesActivity</string>
     <string name="title_activity_create_recipe">CreateRecipeActivity</string>
+    <string name="title_activity_upload_my_recipe">UploadMyRecipeActivity</string>
+    <string name="title_activity_full_recipe_details">FullRecipeDetailsActivity</string>
 </resources>

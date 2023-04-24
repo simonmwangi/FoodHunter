@@ -1,5 +1,7 @@
 package com.ke.foodhunter.recipes
 
+import android.util.Log
+
 class RecipeApiImpl(private val recipeApi: RecipeApi) {
     suspend fun searchRecipes(
         appId: String,
@@ -17,7 +19,10 @@ class RecipeApiImpl(private val recipeApi: RecipeApi) {
         type: String
     ): List<Recipe> {
         val response = recipeApi.searchRecipes(appId, appKey, query, health, ingr, from, to,diet,cuisineType,mealType,dishType,calories, type)
-        return response.hits.map { it.recipe }
+        return response.hits.map {
+            Log.i("HIT", it.recipe.toString())
+            it.recipe
+         }
     }
 }
 

@@ -17,17 +17,17 @@ private val DarkColorPalette = darkColors(
     surface = lightGreyAlpha,
     //grid lines of sudoku board
     primaryVariant = gridLineColorLight,
-    onPrimary = accentAmber,
-    onSurface = accentAmber
+    onPrimary = accentDark,
+    //onSurface = accentAmber
 )
 
 private val LightColorPalette = lightColors(
-    primary = primaryGreen,
+    primary = primaryLight,
     secondary = textColorLight,
     surface = lightGrey,
     primaryVariant = gridLineColorLight,
-    onPrimary = accentAmber,
-    onSurface = accentAmber
+    onPrimary = accentLight,
+    //onSurface = accentAmber
 
     /* Other default colors to override
     background = Color.White,

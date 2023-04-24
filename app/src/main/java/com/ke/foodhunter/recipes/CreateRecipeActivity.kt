@@ -14,6 +14,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,7 +23,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.FileProvider
@@ -57,14 +59,51 @@ class CreateRecipeActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContent {
             CreateRecipeUI()
         }
-
-
-
     }
+
+    @Composable
+    fun TagList(tags: List<String>, onTagsSelected: (Set<String>) -> Unit) {
+        var selectedTags by remember { mutableStateOf(emptySet<String>()) }
+        LazyRow {
+            items(tags.size) { tag ->
+                Tag(tags[tag], selectedTags) { clickedTag ->
+                    if (selectedTags.contains(clickedTag)) {
+                        selectedTags = selectedTags - clickedTag
+                    } else {
+                        selectedTags = selectedTags + clickedTag
+                    }
+                    onTagsSelected(selectedTags)
+                }
+            }
+        }
+    }
+
+
+    @Composable
+    fun Tag(tag: String, selectedTags: Set<String>, onTagClick: (String) -> Unit) {
+        val isSelected = selectedTags.contains(tag)
+        val backgroundColor = if (isSelected) Color.Green else Color.LightGray
+        Surface(
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            shape = RoundedCornerShape(16.dp),
+            color = backgroundColor
+        ) {
+            Text(
+                text = tag,
+                style = MaterialTheme.typography.caption,
+                modifier = Modifier
+                    .clickable { onTagClick(tag) }
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            )
+        }
+    }
+
+
+
+
 
     @Composable
     fun OpenGetImageDialog(onDismiss: () -> Unit) {
@@ -141,6 +180,9 @@ class CreateRecipeActivity : ComponentActivity() {
 
         val viewModel: MyViewModel = viewModel()
 
+        val tags = listOf("Healthy", "Vegetarian", "Easy", "Dinner")
+        var `health-tags` by remember { mutableStateOf("") }
+
         fun clearFields() {
             title = ""
             description = ""
@@ -175,6 +217,10 @@ class CreateRecipeActivity : ComponentActivity() {
                 onValueChange = { steps = it },
                 label = { Text("Steps") }
             )
+            TagList(tags) { selectedTag ->
+                `health-tags` = selectedTag.joinToString(" ")
+            }
+            TextField(value = `health-tags`, onValueChange = { `health-tags` = it })
 
             Button(
                 onClick = {
@@ -345,6 +391,12 @@ class CreateRecipeActivity : ComponentActivity() {
 
     }
 
+    @Composable
+    @Preview(showBackground = true, showSystemUi = true)
+    fun CreateRecipePreview(){
+        CreateRecipeUI()
+    }
+
 }
 
 class MyViewModel : ViewModel() {
@@ -368,7 +420,5 @@ class MyViewModel : ViewModel() {
         open.value = false
     }
 }
-
-
 
 

@@ -7,8 +7,6 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-
-
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -22,13 +20,23 @@
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
-            android:grantUriPermissions="true"
-            android:exported="false">
+            android:exported="false"
+            android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"/>
+                android:resource="@xml/file_paths" />
         </provider>
 
+        <activity
+            android:name=".recipes.FullRecipeDetailsActivity"
+            android:exported="false"
+            android:label="@string/title_activity_full_recipe_details"
+            android:theme="@style/Theme.FoodHunter" />
+        <activity
+            android:name=".recipes.UploadMyRecipeActivity"
+            android:exported="false"
+            android:label="@string/title_activity_upload_my_recipe"
+            android:theme="@style/Theme.FoodHunter" />
         <activity
             android:name=".recipes.CreateRecipeActivity"
             android:exported="false"

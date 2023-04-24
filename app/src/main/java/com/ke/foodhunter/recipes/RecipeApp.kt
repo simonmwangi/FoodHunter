@@ -1,7 +1,9 @@
 package com.ke.foodhunter.recipes
 
+import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -9,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -21,6 +24,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -36,8 +40,14 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ktx.database
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
 import com.ke.foodhunter.MainActivity
 import com.ke.foodhunter.R
+import com.ke.foodhunter.recipes.ui.theme.FoodHunterTheme
+import kotlin.math.roundToInt
 
 val labelMaps = mapOf("Balanced" to "Protein/Fat/Carb values in 15/35/50 ratio",
     "High-Fiber" to "More than 5g fiber per serving",
@@ -122,6 +132,33 @@ val healthLabelMaps = mapOf(
 
 )
 
+fun updateRecipeSave(context: Context, recipe: Recipe,isPressed:Boolean, newLikes: Int) {
+    val database = Firebase.database
+    val recipeRef = database.getReference("recipes/local/approved").child(recipe.recipeId!!)
+
+    recipeRef.child("saves").setValue(newLikes)
+
+    val userRef = FirebaseAuth.getInstance()
+    val userFirestoreRef = FirebaseFirestore.getInstance()
+
+    println("The value of one is $newLikes")
+    if(isPressed){
+        userFirestoreRef.collection("users").document("${userRef.currentUser?.uid}").collection("saved recipes").document(recipe.recipeId!!)
+            .set(mapOf("label" to recipe.label, "image" to recipe.image))
+            .addOnSuccessListener { Toast.makeText(context,"Recipe has been saved", Toast.LENGTH_SHORT).show() }
+            .addOnFailureListener { Toast.makeText(context,"Error in saving the recipe", Toast.LENGTH_SHORT).show() }
+
+    }else{
+        userFirestoreRef.collection("users").document("${userRef.currentUser?.uid}").collection("saved recipes").document(recipe.recipeId!!)
+            .delete()
+            .addOnSuccessListener { Toast.makeText(context,"Recipe removed", Toast.LENGTH_SHORT).show() }
+            .addOnFailureListener { Toast.makeText(context,"Error in removing the recipe", Toast.LENGTH_SHORT).show() }
+
+    }
+
+
+}
+
 @Composable
 fun RecipeApp(recipeViewModel: RecipeViewModel) {
     val context = LocalContext.current
@@ -184,6 +221,7 @@ fun RecipeApp(recipeViewModel: RecipeViewModel) {
             )
             Button(
                 onClick = {
+                    //Search for recipes based on the new query
                     recipeViewModel.searchRecipes(
                         query = mySearch,
                         health = null,
@@ -195,13 +233,14 @@ fun RecipeApp(recipeViewModel: RecipeViewModel) {
                         calories = null,
                         context
                     )
+                    focusManager.clearFocus()
+
                 }
             ) {
-                //Text(text="SEARCH")
                 Icon(Icons.Default.Search, tint = Color.White, contentDescription = null)
             }
         }
-        Button(
+        Button(modifier = Modifier.padding(10.dp),
             onClick = {
                 showSearchDialog = true
             }
@@ -223,38 +262,140 @@ fun RecipeApp(recipeViewModel: RecipeViewModel) {
     }
 }
 
+@Composable
+fun RecipeAdditionalInfo(title: String,imgVector: Int ){
+    Icon(
+        painterResource(id = imgVector),
+        contentDescription = null,
+        tint = Color.Gray,
+        modifier = Modifier.size(18.dp)
+    )
+    Spacer(modifier = Modifier.width(width = 6.dp))
+    Text(
+        text = title,
+        color = Color.Gray,
+        fontSize = 15.sp
+    )
+    Spacer(modifier = Modifier.width(width = 6.dp))
+}
+
 
 @Composable
 fun RecipeCard(recipe: Recipe) {
     var showLabelDialog by remember { mutableStateOf(false) }
     var clickedLabel by remember { mutableStateOf("none") }
 
+    var isPressed by remember { mutableStateOf(false) }
+    var bookmarkIcon = if (isPressed) R.drawable.bookmark_on else R.drawable.bookmark_off
+    var save_nums by remember { mutableStateOf(recipe.saves?.toInt()) }
+    var saveState = if (isPressed) "SAVED" else "SAVE"
+    var finalText by remember { mutableStateOf("") }
+
+    if (save_nums.toString() == "null") finalText = saveState else finalText = "$save_nums $saveState"
+
+    val context  = LocalContext.current
+
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .height(400.dp)
+            .fillMaxSize()
             .padding(10.dp),
         shape = RoundedCornerShape(16.dp),
         elevation = 8.dp,
         backgroundColor = MaterialTheme.colors.primary
     ) {
+
         Column (modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp)){
+        )
+        {
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .padding(5.dp)
+            )
+            {
+                AsyncImage(
+                    model = recipe.image,
+                    placeholder = painterResource(id = R.drawable.image_placeholder),
+                    error = painterResource(id = R.drawable.image_placeholder),
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .size(40.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop,
+                    contentDescription = recipe.label,
+                )
+                Text("recipe.category", modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .padding(start = 50.dp))
+                Text(text = "Date",
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(end = 10.dp)
+                )
+            }
+
 
             AsyncImage(
                 model = recipe.image,
                 placeholder = painterResource(id = R.drawable.image_placeholder),
                 error = painterResource(id = R.drawable.image_placeholder),
                 modifier = Modifier
-                    .height(150.dp)
+                    .height(170.dp)
                     .fillMaxWidth(),
                 contentScale = ContentScale.Crop,
                 contentDescription = recipe.label,
             )
-            Row(modifier = Modifier.padding(top = 20.dp)){
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(5.dp)
+            ){
+                OutlinedButton(
+                    enabled = if (save_nums.toString() == "null") false else true,
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
+                    modifier = Modifier.align(Alignment.CenterStart),
+                    border = BorderStroke(3.dp, color = Color.Gray),
+                    onClick = {
+                        isPressed = !isPressed
+                        save_nums = save_nums?.plus(if (isPressed) 1 else -1)
+
+                        if(!recipe.recipeId.isNullOrEmpty()){
+                            updateRecipeSave(context,recipe, isPressed,save_nums!!.toInt())
+
+                        }
+                    }
+                ){
+                    Icon(
+                        painterResource(id = bookmarkIcon) , "", tint = Color.Gray, modifier = Modifier
+                            .size(25.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(finalText, color = Color.Gray)
+                }
+
+
+                Button(
+                    onClick = {
+                        val intent = Intent(context, FullRecipeDetailsActivity::class.java )
+                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        intent.putExtra("saveState", saveState)
+                        intent.putExtra("recipeData" ,recipe)
+                        context.startActivity(intent)
+                    },
+                    modifier = Modifier
+                        .padding(end = 10.dp)
+                        .align(Alignment.CenterEnd),
+                ) {
+                    Icon(
+                        painterResource(id = R.drawable.view_svg) , "", tint = Color.White, modifier = Modifier
+                            .size(25.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = "VIEW")
+                }
+            }
                 Column(
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.fillMaxHeight() //.weight(1f)
 
                 ) {
                     Text(
@@ -262,9 +403,10 @@ fun RecipeCard(recipe: Recipe) {
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         style = MaterialTheme.typography.h5,
-                        color = MaterialTheme.colors.onPrimary
+                        color = MaterialTheme.colors.onPrimary,
+                        modifier = Modifier.padding(start = 5.dp)
                     )
-                    Column(modifier = Modifier.fillMaxSize()){
+                    Column(modifier = Modifier.fillMaxSize()) {
                         Text(
                             text = "diet-labels (${recipe.dietLabels.size})",
                             style = MaterialTheme.typography.body1,
@@ -275,8 +417,8 @@ fun RecipeCard(recipe: Recipe) {
                             rows = GridCells.Adaptive(100.dp),
                             contentPadding = PaddingValues(start = 10.dp, end = 10.dp),
                             modifier = Modifier.height(35.dp)
-                        ){
-                            items(recipe.dietLabels.size) {index ->
+                        ) {
+                            items(recipe.dietLabels.size) { index ->
                                 Card(
                                     backgroundColor = MaterialTheme.colors.surface,
                                     modifier = Modifier
@@ -287,8 +429,9 @@ fun RecipeCard(recipe: Recipe) {
                                             showLabelDialog = true
                                         }
                                 ) {
-                                    Text(recipe.dietLabels[index],
-                                        style=MaterialTheme.typography.subtitle1,
+                                    Text(
+                                        recipe.dietLabels[index],
+                                        style = MaterialTheme.typography.subtitle1,
                                         textAlign = TextAlign.Center,
                                         modifier = Modifier.padding(5.dp)
                                     )
@@ -303,10 +446,10 @@ fun RecipeCard(recipe: Recipe) {
                         )
                         LazyHorizontalGrid(
                             rows = GridCells.Adaptive(100.dp),
-                            contentPadding = PaddingValues(start = 10.dp, end= 10.dp),
+                            contentPadding = PaddingValues(start = 10.dp, end = 10.dp),
                             modifier = Modifier.height(35.dp)
-                        ){
-                            items(recipe.healthLabels.size) {index ->
+                        ) {
+                            items(recipe.healthLabels.size) { index ->
                                 Card(
                                     backgroundColor = MaterialTheme.colors.surface,
                                     modifier = Modifier
@@ -317,32 +460,39 @@ fun RecipeCard(recipe: Recipe) {
                                             showLabelDialog = true
                                         }
                                 ) {
-                                    Text(recipe.healthLabels[index],
-                                        style=MaterialTheme.typography.subtitle1,
+                                    Text(
+                                        recipe.healthLabels[index],
+                                        style = MaterialTheme.typography.subtitle1,
                                         textAlign = TextAlign.Center,
                                         modifier = Modifier.padding(5.dp)
                                     )
                                 }
                             }
                         }
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(5.dp)
+                        ) {
+
+                            val calories = if (recipe.calories?.equals(0F)!!) "Not Available" else "${recipe.calories.roundToInt()} Cal"
+
+                            RecipeAdditionalInfo(
+                                title = "Not Available",
+                                imgVector = R.drawable.clock_svg
+                            )
+                            RecipeAdditionalInfo(
+                                title = "Not Available",
+                                imgVector = R.drawable.serving_svg
+                            )
+                            RecipeAdditionalInfo(title = calories, imgVector = R.drawable.flame_svg)
+                        }
                     }
-
-
                 }
-                IconButton(
-                    onClick = { },
-                    modifier = Modifier.background(
-                        color = MaterialTheme.colors.surface,
-                        shape = RoundedCornerShape(10.dp)
-                    )
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally){
-                        //Icon(Icons.Default.Add, tint = Color.White,  contentDescription = null)
-                        Text(text = "View", style = MaterialTheme.typography.subtitle1)
-                    }
 
-                }
-            }
+
         }
     }
     if (showLabelDialog){
@@ -402,7 +552,7 @@ fun AdvancedRecipeSearch(recipeViewModel: RecipeViewModel, onDismiss: () -> Unit
 
     //Get search variables
     Dialog(onDismissRequest = { onDismiss() },
-    properties = DialogProperties(dismissOnClickOutside = false)) {
+        properties = DialogProperties(dismissOnClickOutside = false)) {
         Card(
             //shape = MaterialTheme.shapes.medium,
             shape = RoundedCornerShape(10.dp),
@@ -431,15 +581,15 @@ fun AdvancedRecipeSearch(recipeViewModel: RecipeViewModel, onDismiss: () -> Unit
                     onValueChange = { ingredients = it},
                     modifier = Modifier.padding(8.dp),
                     label = { Text("Max Number of ingredients")},
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Done
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                focusManager.clearFocus()
-                            }
-                        )
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            focusManager.clearFocus()
+                        }
+                    )
                 )
 
 
@@ -573,11 +723,18 @@ fun dropdownMenuBox(arrayItems: Array<String>, label: String): String{
 @Composable
 @Preview(showBackground = true, showSystemUi = true)
 fun RecipeAppPreview(){
-    RecipeCard(recipe = Recipe(
-        "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8&auto=format&fit=crop&w=700&q=60",
-        "Spaghetti Carbonara",
-        "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8&auto=format&fit=crop&w=700&q=60",
-        listOf("Dairy-Free","Egg-Free","Peanut-Free","Fish-Free"),
-        listOf("High-Protein","Low-Carb")
-    ))
+    FoodHunterTheme() {
+        RecipeCard(recipe = Recipe("Local",
+            null,"5",
+            "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8&auto=format&fit=crop&w=700&q=60",
+            "Spaghetti Carbonara",
+            "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MXx8fGVufDB8fHx8&auto=format&fit=crop&w=700&q=60",
+            listOf("Dairy-Free","Egg-Free","Peanut-Free","Fish-Free"),
+            listOf("High-Protein","Low-Carb"),
+          //  listOf("image_1","image_2"),
+            listOf("ingredient 1", "ingredient 2"),
+            listOf("step 1","step 2","step 3")
+        ))
+    }
+
 }
